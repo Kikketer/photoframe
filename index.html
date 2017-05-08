@@ -7,16 +7,11 @@
     color: rgb(230,230,230);
     font-family: sans-serif;
   }
-  .flexcontainer {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    flex-direction: row-reverse;
-  }
+
   .container {
-    display: flex;
-    flex-direction: column;
-    margin-right: 5%;
+    position: fixed;
+    right: 5%;
+    top: 35%;
   }
 
   .container div {
@@ -34,12 +29,10 @@
   <script src='/moment.js'></script>
 </head>
 <body>
-  <div class="flexcontainer">
     <div class="container">
       <div class="date"></div>
       <div class="time"></div>
     </div>
-  </div>
   <script>
   (function() {
     setInterval(function () {
