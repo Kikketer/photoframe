@@ -42,17 +42,17 @@
   </div>
   <script>
   (function() {
-    setInterval(() => {
+    setInterval(function () {
       getFormattedDate()
       getFormattedTime()
     }, 1000)
 
     function getFormattedDate() {
-      document.querySelector('.date').innerHTML = moment().format('dddd, MMMM Do')
+      document.getElementsByClassName('date')[0].innerHTML = moment().format('dddd, MMMM Do')
     }
 
     function getFormattedTime() {
-      document.querySelector('.time').innerHTML = moment().format('h:mm a')
+      document.getElementsByClassName('time')[0].innerHTML = moment().format('h:mm a')
     }
   })(window)
   </script>
