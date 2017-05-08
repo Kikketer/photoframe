@@ -1,0 +1,60 @@
+<html>
+<head>
+  <title>Prime Photo Frame</title>
+  <style>
+  body {
+    background-color: black;
+    color: rgb(230,230,230);
+    font-family: sans-serif;
+  }
+  .flexcontainer {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex-direction: row-reverse;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    margin-right: 5%;
+  }
+
+  .container div {
+    text-align: center;
+  }
+
+  .date {
+    font-size: 55pt;
+  }
+
+  .time {
+    font-size: 95pt;
+  }
+  </style>
+  <script src='/moment.js'></script>
+</head>
+<body>
+  <div class="flexcontainer">
+    <div class="container">
+      <div class="date"></div>
+      <div class="time"></div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    setInterval(() => {
+      getFormattedDate()
+      getFormattedTime()
+    }, 1000)
+
+    function getFormattedDate() {
+      document.querySelector('.date').innerHTML = moment().format('dddd, MMMM Do')
+    }
+
+    function getFormattedTime() {
+      document.querySelector('.time').innerHTML = moment().format('h:mm a')
+    }
+  })(window)
+  </script>
+</body>
+</html>
