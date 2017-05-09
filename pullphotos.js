@@ -73,7 +73,7 @@ casper.waitFor(function check() {
 
 casper.then(function() {
     this.echo(this.getTitle());
-    this.capture('photos.png');
+    this.capture('public/primephotos/photos.png');
 
     imageUrls = imageUrls.concat(this.evaluate(getImageUrls))
 });

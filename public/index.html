@@ -9,16 +9,23 @@
       <div class="date"></div>
       <div class="time"></div>
     </div>
+    <div class="weather-container">
+      <div class="icon"><img></img><span class='temp'></span></div>
+      <div class="wind"></div>
+    </div>
   <script src="/scripts/time.js"></script>
   <script src="/scripts/primephotos.js"></script>
+  <script src="/scripts/weather.js"></script>
   <script>
   (function() {
     time.init()
     prime.init()
+    weather.init()
 
     setInterval(function () {
       time.update()
       prime.update()
+      weather.update()
     }, 1000)
   })(window)
   </script>

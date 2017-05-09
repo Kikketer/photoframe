@@ -29,6 +29,6 @@ var prime = {
     },
     setImage: function(index) {
         var body = document.getElementsByTagName('body')[0]
-        body.setAttribute('style', 'background-image: url("' + this.imageUrls[index] + '")')
+        body.setAttribute('style', 'background-image: url("/primephotos/' + this.imageUrls[index] + '")')
     }
 }

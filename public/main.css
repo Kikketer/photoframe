@@ -30,3 +30,22 @@ body {
 .time {
     font-size: 95pt;
 }
+
+/* Weather container */
+.weather-container {
+    color: white;
+    position: fixed;
+    right: 2%;
+    text-align: right;
+    top: 15%;
+}
+
+.weather-container .icon img {
+    height: 100px;
+}
+
+.weather-container .icon .temp {
+    font-size: 40pt;
+    top: -27px;
+    position: relative;
+}
