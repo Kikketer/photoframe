@@ -1,0 +1,32 @@
+body {
+    background-color: black;
+    color: rgb(240,240,240);
+    font-family: sans-serif;
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: contain;
+}
+
+.container {
+    position: fixed;
+    right: 2%;
+    top: 35%;
+}
+
+.container div {
+    text-align: center;
+    padding: 0 25px;
+    text-shadow:
+   -1px -1px 4px #000,  
+    1px -1px 4px #000,
+    -1px 1px 4px #000,
+     1px 1px 4px #000;
+}
+
+.date {
+    font-size: 55pt;
+}
+
+.time {
+    font-size: 95pt;
+}
