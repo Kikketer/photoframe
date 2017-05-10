@@ -5,6 +5,7 @@
   <link rel="stylesheet" href="/main.css">
 </head>
 <body>
+    <div class="fresh-screen"></div>
     <div class="container">
       <div class="date"></div>
       <div class="time"></div>
@@ -16,16 +17,19 @@
   <script src="/scripts/time.js"></script>
   <script src="/scripts/primephotos.js"></script>
   <script src="/scripts/weather.js"></script>
+  <script src="/scripts/freshscreen.js"></script>
   <script>
   (function() {
     time.init()
     prime.init()
     weather.init()
+    fresh.init()
 
     setInterval(function () {
       time.update()
       prime.update()
       weather.update()
+      fresh.update()
     }, 1000)
   })(window)
   </script>
