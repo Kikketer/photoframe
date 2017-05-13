@@ -19,7 +19,7 @@ app.get('/weather', (req, res) => {
       }
       weatherCache = JSON.parse(body)
 
-      request.get(`http://api.openweathermap.org/data/2.5/forecast?id=${process.env.CITY_ID}&APPID=${process.env.OPEN_WEATHER_API}&units=imperial`, (err, resp, bdy) => { 
+      request.get(`http://api.openweathermap.org/data/2.5/forecast?id=${process.env.CITY_ID}&APPID=${process.env.OPEN_WEATHER_API}&units=imperial`, (err, resp, bdy) => {
         if (err) {
           console.error(err)
           return res.status(500).send(err)
@@ -36,7 +36,7 @@ app.get('/weather', (req, res) => {
         }
 
 
-        weatherCache.forecast = {temp: high}
+        weatherCache.forecast = { temp: high }
         lastWeatherUpdate = new Date().getTime()
         res.send(weatherCache)
       })
