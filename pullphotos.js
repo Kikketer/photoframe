@@ -1,5 +1,7 @@
 const fs = require('fs')
 var imageUrls = []
+var years = ['2016', '2015', '2014']
+var url = 'https://www.amazon.com/photos/thisday/'
 
 function getImageUrls() {
     var imageUrls = document.querySelectorAll('.bg-image');
@@ -8,86 +10,60 @@ function getImageUrls() {
     });
 }
 
+function getYear(year) {
+    console.log('Getting Year: ' + year);
+    casper.thenOpen(url + year);
+
+    casper.then(function () {
+        this.capture('2-initial-' + year + '.png')
+    })
+
+    casper.wait(10000, function () {
+        console.log('Done waiting.. hopefully it\'s loaded')
+    })
+
+    casper.then(function () {
+        this.echo(this.getTitle());
+        this.capture('public/primephotos/3-photos-' + year + '.png');
+
+        imageUrls = imageUrls.concat(this.evaluate(getImageUrls))
+    });
+}
+
 var casper = require('casper').create({
     viewportSize: { width: 1280, height: 800 },
-    waitTimeout: 15000
+    waitTimeout: 30000
 });
 
 var email = casper.cli.get('email');
 var password = casper.cli.get('password');
-var target = casper.cli.get(0);
 var totalImages = 0
-
-function isUrl(text) {
-    var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(?::\\d{2,5})?' + // port
-        '(?:/[^\\s]*)?$', 'i'); // path
-
-    return pattern.test(text);
-}
 
 if (!email) throw 'missing email';
 if (!password) throw 'missing password';
-if (!target) throw 'provide a keyword to search or url of an item';
 
 casper.userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36');
 casper.on('step.error complete.error', function (error) {
     throw error;
 });
 
-var url = 'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fyourstore%2Fhome%3Fie%3DUTF8%26ref_%3Dnav_signin';
+var loginUrl = 'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fyourstore%2Fhome%3Fie%3DUTF8%26ref_%3Dnav_signin';
 
-casper.start(url, function () {
+casper.start(loginUrl, function () {
     this.fill('form[name="signIn"]', {
         email: email,
         password: password
-    }, true);
+    }, true)
 });
 
 casper.then(function () {
-    this.capture('login.png');
+    this.capture('progress/1-login.png')
 });
 
-// if (isUrl(target)) {
-casper.thenOpen(target);
-// } else {
-//     casper.thenOpen('http://www.amazon.com/s/?sf=fedaps&keywords=' + encodeURI(target), function () {
-//         this.echo(this.getTitle());
-//         this.capture('results.png');
-
-//         this.click('#resultsCol ul li a');
-//     });
-// }
-
 casper.then(function () {
-    console.log('Getting total images...')
-    this.capture('initial.png')
-    totalImages = this.evaluate(function () {
-        return document.querySelectorAll('.preload-image').length
-    })
-
-    if (totalImages < 2) {
-        console.log('No images found... canceling')
-        throw new Error('No Images found, probably not on the right page')
+    for (var yearIndex = 0; yearIndex < years.length; yearIndex++) {
+        getYear(years[yearIndex])
     }
-
-    console.log(totalImages + ' images found', 'info')
-})
-
-casper.waitFor(function check() {
-    // this.capture('progress.png')
-    return this.evaluate(function () {
-        return document.querySelectorAll('.preload-image.loaded').length >= (totalImages - 2)
-    });
-});
-
-casper.then(function () {
-    this.echo(this.getTitle());
-    this.capture('public/primephotos/photos.png');
-
-    imageUrls = imageUrls.concat(this.evaluate(getImageUrls))
 });
 
 casper.run(function () {
