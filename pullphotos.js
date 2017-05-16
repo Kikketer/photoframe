@@ -4,18 +4,18 @@ var years = ['2016', '2015', '2014']
 var url = 'https://www.amazon.com/photos/thisday/'
 
 function getImageUrls() {
-    var imageUrls = document.querySelectorAll('.bg-image');
-    return Array.prototype.map.call(imageUrls, function (element) {
-        return element.getAttribute('style').match(/url\("(.*)"\)/)[1];
+    var links = document.getElementsByClassName('node-link');
+    return Array.prototype.map.call(links, function (element) {
+        return element.href;
     });
 }
 
 function getYear(year) {
-    console.log('Getting Year: ' + year);
     casper.thenOpen(url + year);
 
     casper.then(function () {
-        this.capture('2-initial-' + year + '.png')
+        console.log('Getting Year: ' + year);
+        this.capture('progress/2-initial-' + year + '.png')
     })
 
     casper.wait(10000, function () {
@@ -24,23 +24,28 @@ function getYear(year) {
 
     casper.then(function () {
         this.echo(this.getTitle());
-        this.capture('public/primephotos/3-photos-' + year + '.png');
+        this.capture('progress/3-photos-' + year + '.png');
 
         imageUrls = imageUrls.concat(this.evaluate(getImageUrls))
+        console.log('Total Images: ', imageUrls);
     });
 }
 
 var casper = require('casper').create({
     viewportSize: { width: 1280, height: 800 },
-    waitTimeout: 30000
+    waitTimeout: 30000,
+    verbose: true,
+    logLevel: "debug"
 });
 
 var email = casper.cli.get('email');
 var password = casper.cli.get('password');
+var zip = casper.cli.get('zip');
 var totalImages = 0
 
 if (!email) throw 'missing email';
 if (!password) throw 'missing password';
+if (!zip) throw 'missing zip code';
 
 casper.userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36');
 casper.on('step.error complete.error', function (error) {
@@ -56,8 +61,29 @@ casper.start(loginUrl, function () {
     }, true)
 });
 
+casper.wait(1000);
+
 casper.then(function () {
     this.capture('progress/1-login.png')
+});
+
+casper.then(function () {
+    var hasZipQuestion = this.evaluate(function () {
+        return !!document.getElementsByName('dcq_question_subjective_1').length;
+    });
+
+    console.log('The zip question? ', hasZipQuestion);
+    if (hasZipQuestion) {
+        this.fill('form[name="ap_dcq_form"]', {
+            dcq_question_subjective_1: zip
+        }, true)
+    }
+});
+
+casper.wait(1000);
+
+casper.then(function () {
+    this.capture('progress/1-zip.png')
 });
 
 casper.then(function () {
@@ -68,10 +94,9 @@ casper.then(function () {
 
 casper.run(function () {
     // echo results in some pretty fashion
-    this.echo(imageUrls.length + ' images found:');
-    this.echo(' - ' + imageUrls.join('\n - '))
+    this.echo(imageUrls.length + ' images found');
 
-    fs.writeFileSync('photoUrls.json', JSON.stringify(
+    fs.writeFileSync('public/primephotos/photoUrls.json', JSON.stringify(
         {
             urls: imageUrls
         }
