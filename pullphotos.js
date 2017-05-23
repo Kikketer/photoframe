@@ -4,10 +4,16 @@ var years = ['2016', '2015', '2014']
 var url = 'https://www.amazon.com/photos/thisday/'
 
 function getImageUrls() {
-    var links = document.getElementsByClassName('node-link');
+    var links = document.getElementsByClassName('this-day-grid')[0].getElementsByClassName('bg-image');
     return Array.prototype.map.call(links, function (element) {
-        return element.href;
+        return element.getAttribute('style').match(/"(.*)\?/g)[0];
     });
+}
+
+function downloadImages() {
+    for (var imageIndex = 0; imageIndex < imageUrls.length; imageIndex++) {
+        casper.download(imageUrls[imageIndex], 'public/primephotos/' + imageIndex + '.jpg')
+    }
 }
 
 function getYear(year) {
@@ -23,19 +29,21 @@ function getYear(year) {
     })
 
     casper.then(function () {
-        this.echo(this.getTitle());
-        this.capture('progress/3-photos-' + year + '.png');
+        this.echo(this.getTitle())
+        this.capture('progress/3-photos-' + year + '.png')
 
         imageUrls = imageUrls.concat(this.evaluate(getImageUrls))
-        console.log('Total Images: ', imageUrls);
+        console.log('Total Images: ', imageUrls)
     });
 }
+
+console.log('Starting download script')
 
 var casper = require('casper').create({
     viewportSize: { width: 1280, height: 800 },
     waitTimeout: 30000,
     verbose: true,
-    logLevel: "debug"
+    logLevel: "info"
 });
 
 var email = casper.cli.get('email');
@@ -43,9 +51,13 @@ var password = casper.cli.get('password');
 var zip = casper.cli.get('zip');
 var totalImages = 0
 
-if (!email) throw 'missing email';
-if (!password) throw 'missing password';
-if (!zip) throw 'missing zip code';
+// console.log('Validating requirements: ' + email + password + zip)
+
+// if (!email) throw 'missing email';
+// if (!password) throw 'missing password';
+// if (!zip) throw 'missing zip code';
+
+console.log('Email: ' + email)
 
 casper.userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36');
 casper.on('step.error complete.error', function (error) {
@@ -55,6 +67,7 @@ casper.on('step.error complete.error', function (error) {
 var loginUrl = 'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fyourstore%2Fhome%3Fie%3DUTF8%26ref_%3Dnav_signin';
 
 casper.start(loginUrl, function () {
+    console.log('Logging in...')
     this.fill('form[name="signIn"]', {
         email: email,
         password: password
@@ -92,15 +105,20 @@ casper.then(function () {
     }
 });
 
+casper.then(function () {
+    console.log('downloading images now...')
+    downloadImages()
+})
+
 casper.run(function () {
     // echo results in some pretty fashion
     this.echo(imageUrls.length + ' images found');
 
-    fs.writeFileSync('public/primephotos/photoUrls.json', JSON.stringify(
+    fs.write('public/primephotos/photoUrls.json', JSON.stringify(
         {
             urls: imageUrls
         }
-    ))
+    ), 'w')
 
     this.exit();
 });
