@@ -1,7 +1,9 @@
 .idea
+.env
 .DS_Store
 node_modules
 notes.sh
 dummy/*
 thisday/
 primephotoframe.service
+progress/

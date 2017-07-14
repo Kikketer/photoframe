@@ -1,37 +1,46 @@
 <html>
+
 <head>
   <title>Prime Photo Frame</title>
   <script src='/moment.js'></script>
   <link rel="stylesheet" href="/main.css">
 </head>
+
 <body>
-    <div class="fresh-screen"></div>
+  <div class="fresh-screen"></div>
+  <div class="time-container">
     <div class="container">
       <div class="date"></div>
       <div class="time"></div>
     </div>
-    <div class="weather-container">
-      <div class="icon"><img></img><span class='temp'></span></div>
-      <div class="wind"></div>
-    </div>
+  </div>
+  <div class="weather-container">
+    <img class="icon" />
+    <span class='temp current'></span>
+    <img class="direction" />
+    <span class="temp forecast"></span>
+  </div>
   <script src="/scripts/time.js"></script>
-  <script src="/scripts/primephotos.js"></script>
+  <!-- <script src="/scripts/primephotos.js"></script> -->
+  <script src="/scripts/bgvideo.js"></script>
   <script src="/scripts/weather.js"></script>
   <script src="/scripts/freshscreen.js"></script>
   <script>
-  (function() {
-    time.init()
-    prime.init()
-    weather.init()
-    fresh.init()
+    (function () {
+      time.init()
+      bgvideo.init()
+      // prime.init()
+      weather.init()
+      fresh.init()
 
-    setInterval(function () {
-      time.update()
-      prime.update()
-      weather.update()
-      fresh.update()
-    }, 1000)
-  })(window)
+      setInterval(function () {
+        time.update()
+        // prime.update()
+        weather.update()
+        fresh.update()
+      }, 1000)
+    })(window)
   </script>
 </body>
+
 </html>
