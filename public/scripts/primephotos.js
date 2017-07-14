@@ -1,5 +1,5 @@
 var prime = {
-    init: function() {
+    init: function () {
         var body = document.getElementsByTagName('body')[0]
 
         var r = new XMLHttpRequest()
@@ -16,7 +16,7 @@ var prime = {
         this.currentImage = 0
         this.waitSeconds = 15
     },
-    update: function() {
+    update: function () {
         this.waitCount++
         if (this.waitCount >= this.waitSeconds) {
             this.waitCount = 0
@@ -27,7 +27,7 @@ var prime = {
             this.setImage(this.currentImage)
         }
     },
-    setImage: function(index) {
+    setImage: function (index) {
         var body = document.getElementsByTagName('body')[0]
         body.setAttribute('style', 'background-image: url("/primephotos/' + this.imageUrls[index] + '")')
     }

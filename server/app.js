@@ -1,3 +1,4 @@
+require('dotenv').config()
 var express = require('express')
 var request = require('request')
 var app = express()
@@ -28,15 +29,27 @@ app.get('/weather', (req, res) => {
         // Find the high for today
         let forecast = JSON.parse(bdy)
         let high = -50
-        // 7 is the number of forecasts for today
-        for (let tm = 0; tm < 7; tm++) {
-          if (forecast.list[tm].main.temp > high) {
+        let direction = 'stable'
+        const numberOfForecasts = 2
+        // numberOfForecasts is the number of forecasts for today
+        for (let tm = 0; tm < numberOfForecasts; tm++) {
+          if (forecast.list && forecast.list[tm].main.temp > high) {
             high = forecast.list[tm].main.temp
           }
         }
 
+        // Check to see what the next forecast is... that's where the temp is heading
+        if (forecast.list) {
+          if (forecast.list[0].main.temp > weatherCache.main.temp) {
+            direction = 'up'
+          }
+          else if (forecast.list[0].main.temp < weatherCache.main.temp) {
+            direction = 'down'
+          }
+        }
 
-        weatherCache.forecast = { temp: high }
+
+        weatherCache.forecast = { temp: high, direction: direction }
         lastWeatherUpdate = new Date().getTime()
         res.send(weatherCache)
       })
@@ -51,8 +64,7 @@ app.get('/weather', (req, res) => {
 app.get('/photourls', (req, res) => {
   res.send({
     urls: [
-      'photos.jpg',
-      'photoB.jpg'
+      'bg1.jpg'
     ]
   })
 })

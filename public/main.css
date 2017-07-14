@@ -4,16 +4,26 @@ body {
     font-family: sans-serif;
     background-repeat: no-repeat;
     background-position: left;
-    background-size: contain;
+    background-size: cover;
+    overflow: hidden;
 }
 
-.container {
+.time-container {
     position: fixed;
-    right: 2%;
+    left: 0;
+    right: 0;
     top: 35%;
+    background-color: rgba(0,0,0,.5);
+    z-index: 100;
 }
 
-.container div {
+.time-container .container {
+    float: right;
+    right: 2%;
+    top: 0;
+}
+
+.time-container div {
     text-align: center;
     padding: 0 25px;
     text-shadow:
@@ -38,16 +48,24 @@ body {
     right: 2%;
     text-align: right;
     top: 15%;
+    z-index: 100;
 }
 
-.weather-container .icon img {
+.weather-container .icon {
     height: 100px;
 }
 
-.weather-container .icon .temp {
+.weather-container .temp {
     font-size: 40pt;
     top: -27px;
     position: relative;
+    text-shadow: 0 0 20px black;
+}
+
+.weather-container .direction {
+    height: 40px;
+    position: relative;
+    top: -25px;
 }
 
 /* Fresh screen */
@@ -60,4 +78,12 @@ body {
     bottom: 0;
     background-color: rgba(0,0,0,1);
     z-index: 1001;
+}
+
+.bg-video {
+    position: fixed;
+    z-index: 0;
+    width: 100%;
+    top: 0;
+    left: 0;
 }
