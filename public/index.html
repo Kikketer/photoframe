@@ -21,22 +21,20 @@
     <span class="temp forecast"></span>
   </div>
   <script src="/scripts/time.js"></script>
-  <!-- <script src="/scripts/primephotos.js"></script> -->
-  <!-- <script src="/scripts/bgvideo.js"></script> -->
+  <script src="/scripts/primephotos.js"></script>
   <script src="/scripts/weather.js"></script>
   <script src="/scripts/freshscreen.js"></script>
   <script>
     (function () {
       time.init()
-      // bgvideo.init()
-      // prime.init()
-      weather.init()
+      prime.init()
+      // weather.init()
       fresh.init()
 
       setInterval(function () {
         time.update()
-        // prime.update()
-        weather.update()
+        prime.update()
+        // weather.update()
         fresh.update()
       }, 1000)
     })(window)
