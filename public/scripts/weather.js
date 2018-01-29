@@ -1,29 +1,29 @@
 var weather = {
-  init: function () {
+  init: function() {
     // Fetch the weather for the day
     // 5 min check
     this.intervalCount = 300
     this.currentInterval = 0
     this.fetchWeather()
   },
-  update: function () {
+  update: function() {
     this.currentInterval++
     if (this.currentInterval >= this.intervalCount) {
       this.currentInterval = 0
       this.fetchWeather()
     }
   },
-  fetchWeather: function () {
+  fetchWeather: function() {
     var r = new XMLHttpRequest()
     var me = this
     r.open('GET', '/weather', true)
-    r.onreadystatechange = function () {
+    r.onreadystatechange = function() {
       if (r.readyState != 4 || r.status != 200) return
       me.renderWeather(JSON.parse(r.responseText))
-    };
+    }
     r.send()
   },
-  renderWeather: function (weatherJson) {
+  renderWeather: function(weatherJson) {
     var iconImg = document.getElementsByClassName('weather-container')[0].getElementsByClassName('icon')[0]
     var current = document.getElementsByClassName('weather-container')[0].getElementsByClassName('current')[0]
     var forecast = document.getElementsByClassName('weather-container')[0].getElementsByClassName('forecast')[0]
