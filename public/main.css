@@ -1,9 +1,13 @@
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: black;
     color: rgb(240,240,240);
     font-family: sans-serif;
     background-repeat: no-repeat;
-    background-position: left;
+    background-position: center;
     background-size: cover;
     overflow: hidden;
 }

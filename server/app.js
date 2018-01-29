@@ -1,6 +1,7 @@
 require('dotenv').config()
-var express = require('express')
-var request = require('request')
+const express = require('express')
+const request = require('request')
+const Photos = require('./photos')
 var app = express()
 app.use(express.static('public'))
 
@@ -13,61 +14,65 @@ let lastWeatherUpdate = 0
 app.get('/weather', (req, res) => {
   if (new Date().getTime() - lastWeatherUpdate >= 900000) {
     console.log('Refreshing Weather Data!')
-    request.get(`http://api.openweathermap.org/data/2.5/weather?id=${process.env.CITY_ID}&APPID=${process.env.OPEN_WEATHER_API}&units=imperial`, (err, resp, body) => {
-      if (err) {
-        console.error(err)
-        return res.status(500).send(err)
-      }
-      weatherCache = JSON.parse(body)
-
-      request.get(`http://api.openweathermap.org/data/2.5/forecast?id=${process.env.CITY_ID}&APPID=${process.env.OPEN_WEATHER_API}&units=imperial`, (err, resp, bdy) => {
+    request.get(
+      `http://api.openweathermap.org/data/2.5/weather?id=${process.env.CITY_ID}&APPID=${
+        process.env.OPEN_WEATHER_API
+      }&units=imperial`,
+      (err, resp, body) => {
         if (err) {
           console.error(err)
           return res.status(500).send(err)
         }
+        weatherCache = JSON.parse(body)
 
-        // Find the high for today
-        let forecast = JSON.parse(bdy)
-        let high = -50
-        let direction = 'stable'
-        const numberOfForecasts = 2
-        // numberOfForecasts is the number of forecasts for today
-        for (let tm = 0; tm < numberOfForecasts; tm++) {
-          if (forecast.list && forecast.list[tm].main.temp > high) {
-            high = forecast.list[tm].main.temp
+        request.get(
+          `http://api.openweathermap.org/data/2.5/forecast?id=${process.env.CITY_ID}&APPID=${
+            process.env.OPEN_WEATHER_API
+          }&units=imperial`,
+          (err, resp, bdy) => {
+            if (err) {
+              console.error(err)
+              return res.status(500).send(err)
+            }
+
+            // Find the high for today
+            let forecast = JSON.parse(bdy)
+            let high = -50
+            let direction = 'stable'
+            const numberOfForecasts = 2
+            // numberOfForecasts is the number of forecasts for today
+            for (let tm = 0; tm < numberOfForecasts; tm++) {
+              if (forecast.list && forecast.list[tm].main.temp > high) {
+                high = forecast.list[tm].main.temp
+              }
+            }
+
+            // Check to see what the next forecast is... that's where the temp is heading
+            if (forecast.list) {
+              if (forecast.list[0].main.temp > weatherCache.main.temp) {
+                direction = 'up'
+              } else if (forecast.list[0].main.temp < weatherCache.main.temp) {
+                direction = 'down'
+              }
+            }
+
+            weatherCache.forecast = { temp: high, direction: direction }
+            lastWeatherUpdate = new Date().getTime()
+            res.send(weatherCache)
           }
-        }
-
-        // Check to see what the next forecast is... that's where the temp is heading
-        if (forecast.list) {
-          if (forecast.list[0].main.temp > weatherCache.main.temp) {
-            direction = 'up'
-          }
-          else if (forecast.list[0].main.temp < weatherCache.main.temp) {
-            direction = 'down'
-          }
-        }
-
-
-        weatherCache.forecast = { temp: high, direction: direction }
-        lastWeatherUpdate = new Date().getTime()
-        res.send(weatherCache)
-      })
-    })
-  }
-  else {
-    res.send(weatherCache);
+        )
+      }
+    )
+  } else {
+    res.send(weatherCache)
   }
   // http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID={APIKEY}
 })
 
-app.get('/photourls', (req, res) => {
-  res.send({
-    urls: [
-      'bg1.jpg'
-    ]
-  })
-})
+// Kick on the photo pull!
+console.log('Starting photo sync')
+const ph = new Photos()
+ph.startSyncTimer()
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}!`)

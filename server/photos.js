@@ -36,9 +36,15 @@ module.exports = class PhotoHandler {
   constructor() {
     this.photostore = path.resolve('./photostore')
     this.odrivePy = process.env.ODRIVE_PY
-    // setInterval(() => {
-    //   // this.unsyncPhotos()
-    // }, 5000)
+  }
+
+  startSyncTimer() {
+    setInterval(() => {
+      console.log('Refreshing photos')
+      this.unsyncPhotos(() => {
+        this.syncNewPhotos()
+      })
+    }, 86400000)
   }
 
   syncNewPhotos() {
@@ -75,20 +81,8 @@ module.exports = class PhotoHandler {
     )
   }
 
-  unsyncPhotos() {
-    console.log('Running')
-    let out = ''
-    PhotoHandler.run_cmd(
-      'ls',
-      ['-al'],
-      buffer => {
-        out += buffer.toString()
-      },
-      () => {
-        console.log(out)
-        out = ''
-      }
-    )
+  unsyncPhotos(cb) {
+    PhotoHandler.run_cmd('python', [this.odrivePy, 'unsync', this.photostore], () => {}, cb)
   }
 
   static syncAndCopyRandomFilesFromDirectory(directory, options, numberToPick) {
