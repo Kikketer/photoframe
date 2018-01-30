@@ -70,9 +70,11 @@ app.get('/weather', (req, res) => {
 })
 
 // Kick on the photo pull!
-console.log('Starting photo sync')
-const ph = new Photos()
-ph.startSyncTimer()
+if (process.env.ODRIVE_PY) {
+  console.log('Starting photo sync')
+  const ph = new Photos()
+  ph.startSyncTimer()
+}
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}!`)
