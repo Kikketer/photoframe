@@ -39,6 +39,11 @@ module.exports = class PhotoHandler {
   }
 
   startSyncTimer() {
+    console.log('Doing initial sync')
+    this.unsyncPhotos(() => {
+      this.syncNewPhotos()
+    })
+
     setInterval(() => {
       console.log('Refreshing photos')
       this.unsyncPhotos(() => {

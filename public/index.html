@@ -31,11 +31,20 @@
       weather.init()
       fresh.init()
 
+      var body = document.getElementsByTagName('body')[0]
+      if (body.requestFullscreen) {
+        body.requestFullscreen()
+      } else if (body.webkitRequestFullscreen) {
+        body.webkitRequestFullscreen()
+      } else if (body.webkitRequestFullScreen) {
+        body.webkitRequestFullScreen()
+      }
+
       setInterval(function () {
         time.update()
         prime.update()
         weather.update()
-        fresh.update()
+        // fresh.update()
       }, 1000)
     })(window)
   </script>

@@ -16,7 +16,7 @@ body {
     position: fixed;
     left: 0;
     right: 0;
-    top: 35%;
+    top: 0;
     background-color: rgba(0,0,0,.5);
     z-index: 100;
 }
@@ -38,11 +38,11 @@ body {
 }
 
 .date {
-    font-size: 55pt;
+    font-size: 35pt;
 }
 
 .time {
-    font-size: 95pt;
+    font-size: 65pt;
 }
 
 /* Weather container */
@@ -51,23 +51,23 @@ body {
     position: fixed;
     right: 2%;
     text-align: right;
-    top: 15%;
+    bottom: 0;
     z-index: 100;
 }
 
 .weather-container .icon {
-    height: 100px;
+    height: 80px;
 }
 
 .weather-container .temp {
-    font-size: 40pt;
+    font-size: 35pt;
     top: -27px;
     position: relative;
     text-shadow: 0 0 20px black;
 }
 
 .weather-container .direction {
-    height: 40px;
+    height: 35px;
     position: relative;
     top: -25px;
 }
