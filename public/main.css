@@ -57,19 +57,21 @@ body {
 
 .weather-container .icon {
     height: 80px;
+    filter: drop-shadow(0 0 2px black);
 }
 
 .weather-container .temp {
     font-size: 35pt;
     top: -27px;
     position: relative;
-    text-shadow: 0 0 20px black;
+    text-shadow: -1px -1px 4px #000, 1px -1px 4px #000, -1px 1px 4px #000, 1px 1px 4px #000;
 }
 
 .weather-container .direction {
     height: 35px;
     position: relative;
     top: -25px;
+    filter: drop-shadow(0 0 2px black);
 }
 
 /* Fresh screen */

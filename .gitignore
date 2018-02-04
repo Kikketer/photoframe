@@ -8,3 +8,4 @@ thisday/
 primephotoframe.service
 progress/
 server/photostore
+public/photostore/*
