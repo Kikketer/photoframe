@@ -1,57 +1,65 @@
 html, body {
     height: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 body {
-    background-color: black;
+    background-color: rgb(0, 0, 0);
     color: rgb(240,240,240);
     font-family: sans-serif;
+    overflow: hidden;
+}
+
+.photoframe {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
     overflow: hidden;
-}
-
-.time-container {
     position: fixed;
-    left: 0;
+    top: 140px;
     right: 0;
-    top: 0;
-    background-color: rgba(0,0,0,.5);
-    z-index: 100;
+    bottom: 0;
+    left: 0;
+    transition: opacity 1s;
 }
 
-.time-container .container {
-    float: right;
-    right: 2%;
-    top: 0;
+.frame-0 {
+    z-index: 2;
+    left: 0;
+    opacity: 0;
 }
 
-.time-container div {
-    text-align: center;
-    padding: 0 25px;
-    text-shadow:
-   -1px -1px 4px #000,  
-    1px -1px 4px #000,
-    -1px 1px 4px #000,
-     1px 1px 4px #000;
+.frame-1 {
+    z-index: 1;
+    right: 0;
 }
 
 .date {
-    font-size: 35pt;
+    position: fixed;
+    left: 15px;
+    top: 15px;
+    background-color: rgba(0,0,0,.5);
+    z-index: 100;
+    font-size: 2.5em;
 }
 
 .time {
-    font-size: 65pt;
+    position: fixed;
+    right: 25px;
+    top: 20px;
+    background-color: rgba(0,0,0,.5);
+    z-index: 100;
+    font-size: 5em;
 }
 
 /* Weather container */
 .weather-container {
     color: white;
     position: fixed;
-    right: 2%;
+    left: 2%;
     text-align: right;
-    bottom: 0;
+    top: 60px;
     z-index: 100;
 }
 
