@@ -47,10 +47,10 @@ body {
 .time {
     position: fixed;
     right: 25px;
-    top: 20px;
+    top: 5px;
     background-color: rgba(0,0,0,.5);
     z-index: 100;
-    font-size: 5em;
+    font-size: 7.2em;
 }
 
 /* Weather container */
