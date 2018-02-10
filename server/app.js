@@ -1,7 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const request = require('request')
-const winston = request('winston')
+const debug = require('debug')('server')
 var app = express()
 app.use(express.static('public'))
 
@@ -70,5 +70,5 @@ app.get('/weather', (req, res) => {
 })
 
 app.listen(port, () => {
-  winston.debug(`Android clock running on port ${port}!`)
+  debug(`Android clock running on port ${port}!`)
 })
