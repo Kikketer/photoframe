@@ -1,11 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { createLogger, format, transports } = require('winston')
-const log = createLogger({
-  level: 'debug',
-  format: format.simple(),
-  transports: [new transports.Console()]
-})
+const debug = require('debug')('photo')
 require('dotenv').config()
 
 const months = [
@@ -56,16 +51,16 @@ module.exports = class PhotoHandler {
     const picturePath = this.source
     const thisMonthsPath = `/${currentSeason} ${lastYear}/${currentMonth} edited`
 
-    log.debug('Unsyncing')
+    debug('Unsyncing')
     this.unsyncPhotos().then(() => {
-      log.debug(`Syncing: ${path.join(this.source, thisMonthsPath)}`)
+      debug(`Syncing: ${path.join(this.source, thisMonthsPath)}`)
 
       PhotoHandler.syncDownToDir(
         path.join(this.source.substr(1), thisMonthsPath),
         path.join(this.source, thisMonthsPath),
         err => {
           if (err) {
-            return log.error(err)
+            return debug(err)
           }
           // Now we pick a random set of JPG pictures to sync and copy them to a location on this server
           PhotoHandler.syncAndCopyRandomFilesFromDirectory(
@@ -91,13 +86,13 @@ module.exports = class PhotoHandler {
     let selectedFiles = []
     for (let i = 0; i < numberToPick; i++) {
       const theFile = files[Math.floor(Math.random() * files.length)]
-      log.debug(`Snagging file: ${path.join(directory, theFile)}`)
+      debug(`Snagging file: ${path.join(directory, theFile)}`)
       const fileName = path.join(directory, theFile)
       if (fileName.match(/\.cloud/)) {
         PhotoHandler.syncSpecificFile(fileName, options, (err, resultFileName) => {
           // We are now out of sync with the for loop, but who cares
-          log.debug(`Finished syncing file: ${resultFileName}`)
-          log.debug(`Placing file to: ${destination}, ${i}`)
+          debug(`Finished syncing file: ${resultFileName}`)
+          debug(`Placing file to: ${destination}, ${i}`)
           PhotoHandler.copyFile(resultFileName, path.resolve(destination, `${i}.jpg`))
         })
       }
@@ -135,14 +130,14 @@ module.exports = class PhotoHandler {
   static syncSpecificFile(file, options, cb) {
     const fileWithoutCloud = file.match(/(.*)\.cloudf?$/)[1]
     return PhotoHandler.run_cmd('python', [options.odrivePy, 'sync', file]).then(() => {
-      log.debug('Waiting until sync is done...')
+      debug('Waiting until sync is done...')
       // wait until the sync process is done
       let status = ''
       let statusInterval = setInterval(() => {
         return PhotoHandler.run_cmd('python', [options.odrivePy, 'syncstate', fileWithoutCloud], o => {
           status += o
         }).then(() => {
-          log.debug(`Is sync done? ${status}`)
+          debug(`Is sync done? ${status}`)
           if (status.match(/Synced/g)) {
             clearInterval(statusInterval)
             cb(null, fileWithoutCloud)
@@ -158,7 +153,7 @@ module.exports = class PhotoHandler {
 
     // Shortcut if we are done
     if (!dirName || steps.length === 0) {
-      log.debug('Dirname is empty, done now...')
+      debug('Dirname is empty, done now...')
       return cb()
     }
 
@@ -168,16 +163,16 @@ module.exports = class PhotoHandler {
     let directoryUpToThisPoint = ''
     let indexOfCurrentStep = absAsArray.indexOf(stepName)
     if (indexOfCurrentStep < 0) {
-      log.debug('Trying with cloudf')
+      debug('Trying with cloudf')
       indexOfCurrentStep = absAsArray.indexOf(stepName + '.cloudf')
     }
-    log.silly(`index of current step: ${(indexOfCurrentStep, stepName)}`)
+    debug(`index of current step: ${(indexOfCurrentStep, stepName)}`)
     directoryUpToThisPoint = absAsArray.slice(0, indexOfCurrentStep).join('/') || '/'
 
-    log.silly(`Directory up to this point: ${directoryUpToThisPoint}`)
+    debug(`Directory up to this point: ${directoryUpToThisPoint}`)
     // Find out if we have the step inside the directory we are in
     const files = fs.readdirSync(directoryUpToThisPoint)
-    log.silly(`Files in dir: ${files}`)
+    debug(`Files in dir: ${files}`)
     const fileReg = new RegExp(stepName)
     const file = files.find(f => {
       // This file isn't found, abort!
@@ -185,12 +180,12 @@ module.exports = class PhotoHandler {
     })
 
     if (file && file.match(/.*\.cloudf$/)) {
-      log.debug(`Dirname is a .cloudf, syncing: ${path.join(directoryUpToThisPoint, file)}`)
+      debug(`Dirname is a .cloudf, syncing: ${path.join(directoryUpToThisPoint, file)}`)
       let fileWithoutCloudF = file.match(/(.*)\.cloudf$/)[1]
 
       return PhotoHandler.run_cmd('python', [options.odrivePy, 'sync', path.join(directoryUpToThisPoint, file)]).then(
         () => {
-          log.debug('Waiting until sync is done... ')
+          debug('Waiting until sync is done... ')
           // wait until the sync process is done
           let status = ''
           let statusInterval = setInterval(() => {
@@ -201,13 +196,13 @@ module.exports = class PhotoHandler {
                 status += o
               }
             ).then(() => {
-              log.debug(`Is sync done? ${status.match(/Synced/g)}`)
+              debug(`Is sync done? ${status.match(/Synced/g)}`)
               if (status.match(/Synced/g)) {
                 clearInterval(statusInterval)
                 let pth = steps.slice()
                 pth.shift()
                 let asString = pth.join('/')
-                log.debug(`Synced, moving down to: ${asString}`)
+                debug(`Synced, moving down to: ${asString}`)
                 PhotoHandler.syncDownToDir(asString, absoluteOriginalPath, cb, options)
               }
               status = ''
@@ -219,7 +214,7 @@ module.exports = class PhotoHandler {
       let pth = steps.slice()
       pth.shift()
       let asString = pth.join('/')
-      log.debug(`Synced, moving down to: ${asString}`)
+      debug(`Synced, moving down to: ${asString}`)
       PhotoHandler.syncDownToDir(asString, absoluteOriginalPath, cb, options)
     } else {
       cb('File not found: ' + path.join(directoryUpToThisPoint, stepName))
@@ -233,7 +228,7 @@ module.exports = class PhotoHandler {
         me = this
 
       child.stdout.on('data', buffer => {
-        // log.debug(buffer.toString())
+        // debug(buffer.toString())
         cb(buffer ? buffer.toString() : '')
       })
       child.stdout.on('end', () => {

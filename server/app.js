@@ -6,14 +6,14 @@ var app = express()
 app.use(express.static('public'))
 
 const port = process.env.PORT || 8080
-winston.debug('Using city: ' + process.env.CITY_ID)
+debug('Using city: ' + process.env.CITY_ID)
 
 let weatherCache = {}
 let lastWeatherUpdate = 0
 
 app.get('/weather', (req, res) => {
   if (new Date().getTime() - lastWeatherUpdate >= 900000) {
-    winston.debug('Refreshing Weather Data!')
+    debug('Refreshing Weather Data!')
     request.get(
       `http://api.openweathermap.org/data/2.5/weather?id=${process.env.CITY_ID}&APPID=${
         process.env.OPEN_WEATHER_API
