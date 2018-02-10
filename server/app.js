@@ -1,19 +1,19 @@
 require('dotenv').config()
 const express = require('express')
 const request = require('request')
-const Photos = require('./photos')
+const winston = request('winston')
 var app = express()
 app.use(express.static('public'))
 
 const port = process.env.PORT || 8080
-console.log('Using city: ' + process.env.CITY_ID)
+winston.debug('Using city: ' + process.env.CITY_ID)
 
 let weatherCache = {}
 let lastWeatherUpdate = 0
 
 app.get('/weather', (req, res) => {
   if (new Date().getTime() - lastWeatherUpdate >= 900000) {
-    console.log('Refreshing Weather Data!')
+    winston.debug('Refreshing Weather Data!')
     request.get(
       `http://api.openweathermap.org/data/2.5/weather?id=${process.env.CITY_ID}&APPID=${
         process.env.OPEN_WEATHER_API
@@ -69,13 +69,6 @@ app.get('/weather', (req, res) => {
   // http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID={APIKEY}
 })
 
-// Kick on the photo pull!
-if (process.env.ODRIVE_PY) {
-  console.log('Starting photo sync')
-  const ph = new Photos()
-  ph.startSyncTimer()
-}
-
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}!`)
+  winston.debug(`Android clock running on port ${port}!`)
 })
