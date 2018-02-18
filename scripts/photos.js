@@ -33,10 +33,11 @@ const monthsToSeason = {
 }
 
 module.exports = class PhotoHandler {
-  constructor(source, destination, odrivePython) {
+  constructor(source, destination, odrivePython, numberToSync) {
     this.source = path.resolve(source)
     this.destination = destination || process.env.SYNC_DIR
     this.odrivePy = odrivePython || process.env.ODRIVE_PY
+    this.numberToSync = numberToSync
   }
 
   syncNewPhotos() {
@@ -54,19 +55,20 @@ module.exports = class PhotoHandler {
     this.unsyncPhotos().then(() => {
       console.log(`Syncing: ${path.join(this.source, thisMonthsPath)}`)
 
-      PhotoHandler.syncDownToDir(
+      this.syncDownToDir(
         path.join(this.source.substr(1), thisMonthsPath),
         path.join(this.source, thisMonthsPath),
         err => {
+          console.log('Finished syncing down to the directory')
           if (err) {
-            return console.log(err)
+            return console.error(err)
           }
           // Now we pick a random set of JPG pictures to sync and copy them to a location on this server
-          PhotoHandler.syncAndCopyRandomFilesFromDirectory(
+          this.syncAndCopyRandomFilesFromDirectory(
             path.join(this.source, thisMonthsPath),
             this.destination,
             { odrivePy: this.odrivePy },
-            3
+            this.numberToSync
           )
         },
         {
@@ -80,29 +82,73 @@ module.exports = class PhotoHandler {
     return PhotoHandler.run_cmd('python', [this.odrivePy, 'unsync', this.source])
   }
 
-  static syncAndCopyRandomFilesFromDirectory(directory, destination, options, numberToPick) {
+  something(picked) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        console.log('Resolving: ', picked)
+        resolve()
+      }, 1500)
+    })
+  }
+
+  async syncAndCopyRandomFilesFromDirectory(directory, destination, options, numberToPick) {
     const files = fs.readdirSync(directory)
+    console.log('Finding ' + numberToPick + ' random files to pick')
     let selectedFiles = []
-    for (let i = 0; i < numberToPick; i++) {
+    let picked = 0
+
+    while (picked < numberToPick) {
       const theFile = files[Math.floor(Math.random() * files.length)]
-      console.log(`Snagging file: ${path.join(directory, theFile)}`)
+      // console.log(`Attempting to snag file: ${path.join(directory, theFile)}`)
       const fileName = path.join(directory, theFile)
-      if (fileName.match(/\.cloud/)) {
-        PhotoHandler.syncSpecificFile(fileName, options, (err, resultFileName) => {
-          // We are now out of sync with the for loop, but who cares
-          console.log(`Finished syncing file: ${resultFileName}`)
-          console.log(`Placing file to: ${destination}, ${i}`)
-          PhotoHandler.copyFile(resultFileName, path.resolve(destination, `${i}.jpg`))
+      if (fileName.match(/\.cloud$/)) {
+        // await this.something(picked)
+        const resultFileName = await this.syncSpecificFile(fileName, options)
+        // We are now out of sync with the for loop, but who cares
+        console.log(`Finished syncing file: ${resultFileName}`)
+        console.log(`Placing file to: ${destination}, ${picked}`)
+        await new Promise(resolve => {
+          this.copyFile(resultFileName, path.resolve(destination, `${picked}.jpg`), err => {
+            console.log('Finished copying file')
+            return resolve()
+          })
         })
+        picked++
       }
     }
 
-    // Now odrive sync these files
+    // return PhotoHandler.promiseSerial(selectedFiles)
+    //   .then(() => {
+    //     console.log('Done with all')
+    //   })
+    //   .catch(err => {
+    //     console.error(err)
+    //   })
 
-    return selectedFiles
+    // selectedFiles.forEach(async file => {
+    //   console.log(`Grabbing file: ${file}`)
+    //   var fn = () => {
+    //     return new Promise(resolve => {
+    //       setTimeout(() => {
+    //         console.log('resolving')
+    //       }, 15000)
+    //     })
+    //   }
+
+    //   await fn()
+    //   // await PhotoHandler.syncSpecificFile(fileName, options, (err, resultFileName) => {
+    //   //   // We are now out of sync with the for loop, but who cares
+    //   //   console.log(`Finished syncing file: ${resultFileName}`)
+    //   //   console.log(`Placing file to: ${destination}, ${picked}`)
+    //   //   PhotoHandler.copyFile(resultFileName, path.resolve(destination, `${picked}.jpg`))
+    //   // })
+    //   console.log('Finished syncing file')
+    // })
+
+    // return selectedFiles
   }
 
-  static copyFile(source, target, cb = () => {}) {
+  copyFile(source, target, cb = () => {}) {
     var cbCalled = false
 
     var rd = fs.createReadStream(source)
@@ -126,28 +172,31 @@ module.exports = class PhotoHandler {
     }
   }
 
-  static syncSpecificFile(file, options, cb) {
+  syncSpecificFile(file, options) {
     const fileWithoutCloud = file.match(/(.*)\.cloudf?$/)[1]
-    return PhotoHandler.run_cmd('python', [options.odrivePy, 'sync', file]).then(() => {
-      console.log('Waiting until sync is done...')
-      // wait until the sync process is done
-      let status = ''
-      let statusInterval = setInterval(() => {
-        return PhotoHandler.run_cmd('python', [options.odrivePy, 'syncstate', fileWithoutCloud], o => {
-          status += o
-        }).then(() => {
-          console.log(`Is sync done? ${status}`)
-          if (status.match(/Synced/g)) {
-            clearInterval(statusInterval)
-            cb(null, fileWithoutCloud)
-          }
-          status = ''
-        })
-      }, 1000)
+    return new Promise(resolve => {
+      return PhotoHandler.run_cmd('python', [options.odrivePy, 'sync', file]).then(() => {
+        console.log('Waiting until sync is done...')
+        // wait until the sync process is done
+        let status = ''
+        let statusInterval = setInterval(() => {
+          return PhotoHandler.run_cmd('python', [options.odrivePy, 'syncstate', fileWithoutCloud], o => {
+            status += o
+          }).then(() => {
+            console.log(`Is sync done? ${status}`)
+            if (status.match(/Synced/g)) {
+              clearInterval(statusInterval)
+              resolve(fileWithoutCloud)
+              // cb(null, fileWithoutCloud)
+            }
+            status = ''
+          })
+        }, 1000)
+      })
     })
   }
 
-  static syncDownToDir(dirName, absoluteOriginalPath, cb, options) {
+  syncDownToDir(dirName, absoluteOriginalPath, cb, options) {
     const steps = dirName.split('/')
 
     // Shortcut if we are done
@@ -171,7 +220,7 @@ module.exports = class PhotoHandler {
     console.log(`Directory up to this point: ${directoryUpToThisPoint}`)
     // Find out if we have the step inside the directory we are in
     const files = fs.readdirSync(directoryUpToThisPoint)
-    console.log(`Files in dir: ${files}`)
+    // console.log(`Files in dir: ${files}`)
     const fileReg = new RegExp(stepName)
     const file = files.find(f => {
       // This file isn't found, abort!
@@ -202,7 +251,7 @@ module.exports = class PhotoHandler {
                 pth.shift()
                 let asString = pth.join('/')
                 console.log(`Synced, moving down to: ${asString}`)
-                PhotoHandler.syncDownToDir(asString, absoluteOriginalPath, cb, options)
+                this.syncDownToDir(asString, absoluteOriginalPath, cb, options)
               }
               status = ''
             })
@@ -214,7 +263,7 @@ module.exports = class PhotoHandler {
       pth.shift()
       let asString = pth.join('/')
       console.log(`Synced, moving down to: ${asString}`)
-      PhotoHandler.syncDownToDir(asString, absoluteOriginalPath, cb, options)
+      this.syncDownToDir(asString, absoluteOriginalPath, cb, options)
     } else {
       cb('File not found: ' + path.join(directoryUpToThisPoint, stepName))
     }
@@ -234,5 +283,12 @@ module.exports = class PhotoHandler {
         resolve()
       })
     })
+  }
+
+  static promiseSerial(funcs) {
+    return funcs.reduce(
+      (promise, func) => promise.then(result => func().then(Array.prototype.concat.bind(result))),
+      Promise.resolve([])
+    )
   }
 }
