@@ -3,7 +3,7 @@ const PhotoHandler = require('./photos')
 const odriveSource = process.argv[2]
 const destination = process.argv[3]
 const odrivePython = process.argv[4]
-const numberToSync = process.argv[5] || 3
+const numberToSync = process.argv[5]
 
 if (!odriveSource || !destination || !odrivePython) {
   throw new Error(
