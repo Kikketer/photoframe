@@ -6,8 +6,8 @@ var prime = {
     this.waitSeconds = 30
     this.refreshTime = new Date().getTime()
     this.refreshInterval = 86400000
-    this.setImage(this.currentImageIndex + '.jpg?r=' + this.refreshTime, 0)
-    this.setImage(this.currentImageIndex + 1 + '.jpg?r=' + this.refreshTime, 1)
+    this.setImage(0)
+    this.setImage(1)
     this.currentFrameIndex = 0
   },
   update: function() {
@@ -39,18 +39,18 @@ var prime = {
         this.frames[0].style.opacity = 0
         setTimeout(function() {
           // Load the next image into this frame
-          me.setImage(me.currentImageIndex + '.jpg?r=' + me.refreshTime, 0)
+          me.setImage(0)
         }, 1200)
       } else {
         this.frames[0].style.opacity = 1
         setTimeout(function() {
           // Load the image in the other frame (the one now hidden under this)
-          me.setImage(me.currentImageIndex + '.jpg?r=' + me.refreshTime, 1)
+          me.setImage(1)
         }, 1200)
       }
     }
   },
-  setImage: function(name, frameIndex) {
-    this.frames[frameIndex].setAttribute('style', 'background-image: url("/photostore/' + name + '")')
+  setImage: function(frameIndex) {
+    this.frames[frameIndex].setAttribute('style', 'background-image: url("/image?r=' + Math.random() + '")')
   }
 }

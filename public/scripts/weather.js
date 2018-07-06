@@ -19,6 +19,11 @@ var weather = {
     r.open('GET', '/weather', true)
     r.onreadystatechange = function() {
       if (r.readyState != 4 || r.status != 200) return
+      var jsonResponse = JSON.parse(r.responseText)
+      if(jsonResponse.cod === 401) {
+        // Shortcut if it's a bad response code
+        return
+      }
       me.renderWeather(JSON.parse(r.responseText))
     }
     r.send()

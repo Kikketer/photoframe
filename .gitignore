@@ -10,3 +10,4 @@ progress/
 server/photostore
 public/photostore/*
 *.log
+package-lock.json

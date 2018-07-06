@@ -1,6 +1,8 @@
 require('dotenv').config()
 const express = require('express')
 const request = require('request')
+const fs = require('fs')
+const path = require('path')
 const debug = require('debug')('server')
 var app = express()
 app.use(express.static('public'))
@@ -10,6 +12,16 @@ debug('Using city: ' + process.env.CITY_ID)
 
 let weatherCache = {}
 let lastWeatherUpdate = 0
+
+app.get('/image', (req, res) => {
+  // Snag a random image from the photostore
+  const directory = path.resolve('./public/photostore')
+  const files = fs.readdirSync(directory)
+  const imageFiles = files.filter(fileName => fileName.match(/\.jpg$/))
+  console.log('Images available: ', imageFiles)
+  // res.sendFile(files[Math.random() * files.length])
+  res.sendFile(path.resolve(`./public/photostore/${imageFiles[Math.floor(Math.random() * imageFiles.length)]}`))
+})
 
 app.get('/weather', (req, res) => {
   if (new Date().getTime() - lastWeatherUpdate >= 900000) {
