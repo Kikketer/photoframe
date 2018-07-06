@@ -18,8 +18,6 @@ app.get('/image', (req, res) => {
   const directory = path.resolve('./public/photostore')
   const files = fs.readdirSync(directory)
   const imageFiles = files.filter(fileName => fileName.match(/\.jpg$/))
-  console.log('Images available: ', imageFiles)
-  // res.sendFile(files[Math.random() * files.length])
   res.sendFile(path.resolve(`./public/photostore/${imageFiles[Math.floor(Math.random() * imageFiles.length)]}`))
 })
 
