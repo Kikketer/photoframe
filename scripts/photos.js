@@ -67,8 +67,7 @@ module.exports = class PhotoHandler {
           this.syncAndCopyRandomFilesFromDirectory(
             path.join(this.source, thisMonthsPath),
             this.destination,
-            { odrivePy: this.odrivePy },
-            this.numberToSync
+            { odrivePy: this.odrivePy }
           )
         },
         {
@@ -93,6 +92,7 @@ module.exports = class PhotoHandler {
 
   async syncAndCopyRandomFilesFromDirectory(directory, destination, options, numberToPick) {
     const files = fs.readdirSync(directory)
+    numberToPick = numberToPick || files.length
     console.log('Finding ' + numberToPick + ' random files to pick')
     let selectedFiles = []
     let picked = 0
