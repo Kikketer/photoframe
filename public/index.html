@@ -7,9 +7,9 @@
 </head>
 
 <body>
-  <div class="fresh-screen"></div>
   <div class="date"></div>
   <div class="time"></div>
+  <div class="fresh-screen"></div>
   <div class="weather-container">
     <img class="icon" />
     <span class='temp current'></span>
@@ -30,13 +30,16 @@
       fresh.init()
 
       var body = document.getElementsByTagName('body')[0]
-      if (body.requestFullscreen) {
-        body.requestFullscreen()
-      } else if (body.webkitRequestFullscreen) {
-        body.webkitRequestFullscreen()
-      } else if (body.webkitRequestFullScreen) {
-        body.webkitRequestFullScreen()
-      }
+      var t = document.getElementsByClassName('time')[0]
+      t.addEventListener('click', function() {
+        if (body.requestFullscreen) {
+          body.requestFullscreen()
+        } else if (body.webkitRequestFullscreen) {
+          body.webkitRequestFullscreen()
+        } else if (body.webkitRequestFullScreen) {
+          body.webkitRequestFullScreen()
+        }
+      })
 
       setInterval(function () {
         time.update()
