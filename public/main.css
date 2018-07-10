@@ -13,7 +13,7 @@ body {
 
 .photoframe {
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: center 30%;
     background-size: cover;
     overflow: hidden;
     position: fixed;
@@ -90,8 +90,8 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,1);
-    z-index: 1001;
+    background-color: rgba(0,0,0,.9);
+    z-index: 3;
 }
 
 .bg-video {
