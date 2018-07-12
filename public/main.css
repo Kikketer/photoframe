@@ -13,8 +13,8 @@ body {
 
 .photoframe {
     background-repeat: no-repeat;
-    background-position: center 30%;
-    background-size: cover;
+    background-position: center;
+    background-size: contain;
     overflow: hidden;
     position: fixed;
     top: 140px;
@@ -25,21 +25,38 @@ body {
 }
 
 .frame-0 {
-    z-index: 2;
+    z-index: 5;
     left: 0;
     opacity: 0;
 }
 
 .frame-1 {
-    z-index: 1;
+    z-index: 3;
     right: 0;
+}
+
+.blur {
+    filter: blur(50px);
+    background-size: cover;
+    top: 140px;
+    right: -50px;
+    bottom: -50px;
+    left: -50px;
+}
+
+.blur-0 {
+    z-index: 4;
+}
+
+.blur-1 {
+    z-index: 2;
 }
 
 .date {
     position: fixed;
     left: 15px;
     top: 15px;
-    background-color: rgba(0,0,0,.5);
+    /*background-color: rgba(0,0,0,.5);*/
     z-index: 100;
     font-size: 2.5em;
 }
@@ -48,7 +65,7 @@ body {
     position: fixed;
     right: 25px;
     top: 5px;
-    background-color: rgba(0,0,0,.5);
+    /*background-color: rgba(0,0,0,.5);*/
     z-index: 100;
     font-size: 7.2em;
 }

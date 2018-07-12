@@ -1,6 +1,7 @@
 var prime = {
   init: function() {
     this.frames = [document.getElementsByClassName('frame-0')[0], document.getElementsByClassName('frame-1')[0]]
+    this.blurFrames = [document.getElementsByClassName('frame-0')[1], document.getElementsByClassName('frame-1')[1]]
     this.waitCount = 0
     this.currentImageIndex = 0
     this.waitSeconds = 30
@@ -37,12 +38,14 @@ var prime = {
       // TODO make this work better, but I'm watching football so it's good enough
       if (this.currentFrameIndex === 0) {
         this.frames[0].style.opacity = 0
+        this.blurFrames[0].style.opacity = 0
         setTimeout(function() {
           // Load the next image into this frame
           me.setImage(0)
         }, 1200)
       } else {
         this.frames[0].style.opacity = 1
+        this.blurFrames[0].style.opacity = 1
         setTimeout(function() {
           // Load the image in the other frame (the one now hidden under this)
           me.setImage(1)
@@ -51,6 +54,8 @@ var prime = {
     }
   },
   setImage: function(frameIndex) {
-    this.frames[frameIndex].setAttribute('style', 'background-image: url("/image?r=' + Math.random() + '")')
+    var rando = Math.random()
+    this.frames[frameIndex].setAttribute('style', 'background-image: url("/image?r=' + rando + '")')
+    this.blurFrames[frameIndex].setAttribute('style', 'background-image: url("/image?r=' + rando + '")')
   }
 }
