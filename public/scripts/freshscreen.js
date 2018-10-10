@@ -13,5 +13,9 @@ var fresh = {
     else {
       document.getElementsByClassName('fresh-screen')[0].setAttribute('style', 'display:none')
     }
+
+    if(now.getHours() === 10 && now.getMinutes() === 0 && now.getSeconds() >= 0 && now.getSeconds() < 2) {
+      window.location.reload()
+    }
   }
 }
